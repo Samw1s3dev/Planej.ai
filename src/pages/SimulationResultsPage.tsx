@@ -1,20 +1,23 @@
-import { Card } from "@src/components/features/Simulation/SimulationResults/Card";
+import { AIInsightsCard } from "@src/components/features/SimulationResults/AIInsightCardProps";
+import { Card } from "@src/components/features/SimulationResults/Card";
 import { PageHero } from "@src/components/shared/PageHero";
-import type { SimulationFormData } from "@src/data/simulation";
+import { useSimulationStorage } from "@src/hooks/useSimulationStorage";
 import { calcMonthlySavings } from "@src/utils/simulation";
 import { CalendarClock, CreditCardIcon, Goal, Landmark, PiggyBank, Wallet } from "lucide-react";
+import { useParams } from "react-router-dom";
 
-const mock: SimulationFormData = {
-    income: "R$ 5.000,00",
-    expenses: "R$ 2.000,00",
-    debts: "R$ 500,00",
-    goalName: "Viagem para o Japão",
-    goalAmount: "R$ 15.000,00",
-    goalDeadLine: "12",
-}
+
 
 export function SimulationResultsPage() {
-    const data: SimulationFormData = mock
+    const { id } = useParams<{ id: string }>()
+    const { getFormData } = useSimulationStorage()
+
+    const data = id ? getFormData(id) : null
+
+    if (!data) {
+        return <p>Simulação não encontrada.</p>
+    }
+
     const monthlySavings = calcMonthlySavings(data)
 
     return (
@@ -45,10 +48,7 @@ export function SimulationResultsPage() {
                 />
             </div>
             <div className="grid gap-6 lg:grid-cols-3">
-                <div className="bg-card order-2 rounded-2xl p-6 shadow-[4px_4px_18px_0px_rgba(0,0,0,0.2)] lg:order-1 lg:col-span-2">
-                    Painel de Insights
-                </div>
-            
+                <AIInsightsCard simulationId={data.id} />
                 <div className="order-1 flex flex-col gap-6 lg:order-2">
                     <Card
                         icon={Wallet}
